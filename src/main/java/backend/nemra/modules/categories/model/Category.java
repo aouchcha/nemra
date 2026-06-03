@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,8 +23,10 @@ public class Category {
     private String nameFr;
     @Column(name = "name_ar", nullable = false)
     private String nameAr;
+    @Column(name = "is_active")
+    private boolean isActive = true;
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt =  LocalDateTime.now();
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<ProviderProfile> providers;
 }

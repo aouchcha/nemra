@@ -1,5 +1,6 @@
 package backend.nemra.modules.auth.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,10 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class RegisterProvider extends RegisterRequest {
+    @NotNull(message = "business name is required")
     private String business_name;
-    private UUID business_id;
+    @NotNull(message = "category is required")
+    private String category;
     private String bio;
     private int years_of_experience;
-    private boolean is_verified = false;
-    private double avg_rating = 0.0;
-    private int total_reviews = 0;
 }

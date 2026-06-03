@@ -1,5 +1,6 @@
 package backend.nemra.modules.users.model;
 
+import backend.nemra.modules.clients.model.ClientProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,11 +15,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column(name = "phone")
     private String phoneNumber;
@@ -30,13 +28,13 @@ public class User {
     private Role role;
 
     @Column(name = "is_active")
-    private boolean active;
+    private boolean active = true;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ClientProfile clientProfile;

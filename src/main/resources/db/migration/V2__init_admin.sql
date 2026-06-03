@@ -1,6 +1,5 @@
 INSERT INTO users (
-    first_name,
-    last_name,
+    full_name,
     phone,
     password_hash,
     role,
@@ -8,8 +7,7 @@ INSERT INTO users (
     created_at,
     updated_at
 ) VALUES (
-             'admin',
-             'admin',
+             'admin admin',
              '0123456789',
              'ADMIN123@@',
              'ADMIN',

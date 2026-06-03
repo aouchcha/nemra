@@ -1,5 +1,6 @@
-package backend.nemra.modules.users.model;
+package backend.nemra.modules.clients.model;
 
+import backend.nemra.modules.users.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -7,7 +8,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "clients_profile")
+@Table(name = "client_profiles")
 @Data
 public class ClientProfile {
     @Id

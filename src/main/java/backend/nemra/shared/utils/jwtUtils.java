@@ -1,4 +1,4 @@
-package backend.nemra.shared.jwtShared;
+package backend.nemra.shared.utils;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -12,11 +12,11 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
-public class Token {
+public class jwtUtils {
     private final Key secretKey;
     private final long expiresIn;
 
-    public Token(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") long expiresIn) {
+    public jwtUtils(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") long expiresIn) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
         this.expiresIn = expiresIn;
     }

@@ -42,8 +42,8 @@ public class ProviderProfile {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    private boolean is_verified;
-    private double avg_rating;
-    private int total_reviews;
-    private Date created_at;
+    private boolean is_verified = false;
+    private double avg_rating = 0.;
+    private int total_reviews = 0;
+    private Date created_at =  new Date();
 }

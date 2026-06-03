@@ -1,0 +1,16 @@
+INSERT INTO categories (name_en, name_fr, name_ar, is_active, created_at) VALUES
+    ('Plumber',           'Plombier',           'سباك',          true, NOW()),
+    ('Electrician',        'Électricien',       'كهربائي',       true, NOW()),
+    ('Carpenter',          'Menuisier',         'نجار',          true, NOW()),
+    ('Aluminum Worker',    'Aluminier',         'عامل الألمنيوم', true, NOW()),
+    ('Painter',            'Peintre',           'دهان',          true, NOW()),
+    ('Tiler',              'Carreleur',         'بلاط',           true, NOW()),
+    ('Mason',              'Maçon',             'بناء',          true, NOW()),
+    ('Welder',             'Soudeur',           'لحام',          true, NOW()),
+    ('Locksmith',          'Serrurier',         'قفال',          true, NOW()),
+    ('AC Technician',      'Technicien Clim',   'تقني تكييف',    true, NOW()),
+    ('Cleaning Service',   'Nettoyage',         'تنظيف',         true, NOW()),
+    ('Gardener',           'Jardinier',         'بستاني',        true, NOW()),
+    ('Moving Service',     'Déménagement',      'نقل عفش',       true, NOW()),
+    ('IT Technician',      'Technicien Info',   'تقني معلوميات', true, NOW()),
+    ('Photographer',       'Photographe',       'مصور',          true, NOW());
