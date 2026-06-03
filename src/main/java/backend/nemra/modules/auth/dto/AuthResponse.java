@@ -1,8 +1,10 @@
 package backend.nemra.modules.auth.dto;
 
+import backend.nemra.modules.users.dto.UserDTO;
 import lombok.Data;
 
 @Data
 public class AuthResponse {
-    private String message;
+    private String token;
+    private UserDTO user;
 }
