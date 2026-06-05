@@ -143,13 +143,18 @@ public class AuthService {
         if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Bad Credentials", null, false));
         }
+        RefreshToken token = authRepository.findByUser_Id(user.getId()).orElse(null);
+        String refreshToken;
+        if (token == null || !jwtUtils.validateToken(token.getRefreshToken())) {
+            refreshToken = jwtUtils.generateRefreshToken(user.getId());
+            RefreshToken t = new RefreshToken();
+            t.setUser(user);
+            t.setRefreshToken(refreshToken);
+            authRepository.save(t);
+        } else {
+            refreshToken = token.getRefreshToken();
+        }
         String accessToken = jwtUtils.generateAccessToken(user.getId(), user.getRole().toString());
-        String refreshToken = jwtUtils.generateRefreshToken(user.getId());
-
-        RefreshToken t = new RefreshToken();
-        t.setUser(user);
-        t.setRefreshToken(refreshToken);
-        authRepository.save(t);
 
         UserDTO dto;
         if (user.getRole().equals(Role.CLIENT)) {
@@ -202,7 +207,9 @@ public class AuthService {
     }
 
     public ResponseEntity<ApiResponse> logout(String refreshToken) {
+        System.out.println("Refresh token: " + refreshToken);
         UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        System.out.println("User id: " + userId);
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("User not found", null, false));

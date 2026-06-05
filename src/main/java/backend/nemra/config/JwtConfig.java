@@ -28,10 +28,12 @@ public class JwtConfig extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtHelper.resolveToken(request);
-
+        System.out.println("token in Config: " + token);
         if  (token != null && jwtHelper.validateToken(token)) {
             String uuid = jwtHelper.getUuid(token);
+            System.out.println("User id in Config: " + uuid);
             String role = jwtHelper.getRole(token);
+            System.out.println("Role in Config: " + role);
 
             List<GrantedAuthority> authorities = new ArrayList<>();
             if (role != null && !role.isEmpty()) {
