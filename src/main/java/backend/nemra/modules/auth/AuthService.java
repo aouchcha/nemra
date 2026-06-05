@@ -1,8 +1,10 @@
 package backend.nemra.modules.auth;
 
 import backend.nemra.modules.auth.dto.AuthResponse;
+import backend.nemra.modules.auth.dto.LoginRequest;
 import backend.nemra.modules.auth.dto.RegisterClient;
 import backend.nemra.modules.auth.dto.RegisterProvider;
+import backend.nemra.modules.auth.model.RefreshToken;
 import backend.nemra.modules.categories.CategoryRepository;
 import backend.nemra.modules.categories.model.Category;
 import backend.nemra.modules.clients.ClientRepository;
@@ -16,17 +18,23 @@ import backend.nemra.modules.users.dto.UserDTO;
 import backend.nemra.modules.users.model.Role;
 import backend.nemra.modules.users.model.User;
 import backend.nemra.shared.response.ApiResponse;
+import backend.nemra.shared.utils.MapperUserDTO;
 import backend.nemra.shared.utils.jwtUtils;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.UUID;
 
+@Slf4j
 @Service
 public class AuthService {
+    private final AuthRepository authRepository;
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
     private final ProviderRepository providerRepository;
@@ -34,12 +42,14 @@ public class AuthService {
     private final jwtUtils jwtUtils;
 
     public AuthService(
+            AuthRepository authRepository,
             UserRepository userRepository ,
             ClientRepository clientRepository,
             ProviderRepository providerRepository,
             CategoryRepository categoryRepository,
             jwtUtils jwtUtils
     ) {
+        this.authRepository = authRepository;
         this.userRepository = userRepository;
         this.clientRepository = clientRepository;
         this.providerRepository = providerRepository;
@@ -48,7 +58,7 @@ public class AuthService {
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse> RegisterClient(RegisterClient request) {
+    public ResponseEntity<ApiResponse> registerClient(RegisterClient request) {
         System.out.println("RegisterClient targeted");
         try {
             User newUser = new User();
@@ -63,35 +73,35 @@ public class AuthService {
             newClientProfile.setFullName(request.getFullName());
             newClientProfile.setCity(request.getCity());
             newClientProfile.setCreated(new Date());
-            clientRepository.save(newClientProfile);
+            newClientProfile = clientRepository.save(newClientProfile);
 
-            String token = jwtUtils.generateToken(newUser.getId(), Role.CLIENT.toString());
+            String accessToken = jwtUtils.generateAccessToken(newUser.getId(), Role.CLIENT.toString());
+            String refreshToken = jwtUtils.generateRefreshToken(newUser.getId());
+            RefreshToken t = new RefreshToken();
+            t.setUser(newUser);
+            t.setRefreshToken(refreshToken);
+            authRepository.save(t);
 
-            ClientProfileDTO newClientProfileDTO = ClientProfileDTO.builder()
-                    .user_id(newUser.getId())
-                    .client_profile_id(newClientProfile.getId())
-                    .fullName(request.getFullName())
-                    .city(request.getCity())
-                    .createdAt(newUser.getCreatedAt())
-                    .build();
+            UserDTO newClientProfileDTO = MapperUserDTO.buildClientDTO(newClientProfile);
 
             AuthResponse authResponse = new AuthResponse();
-            authResponse.setToken(token);
+            authResponse.setAccessToken(accessToken);
+            authResponse.setRefreshToken(refreshToken);
             authResponse.setUser(newClientProfileDTO);
 
 
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Client created successfully", authResponse));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Client created successfully", authResponse, true));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Server error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Server error", e.getMessage(), false));
         }
 
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse> RegisterProvider(RegisterProvider request) {
+    public ResponseEntity<ApiResponse> registerProvider(RegisterProvider request) {
         Category category = categoryRepository.findByNameIgnoreCase(request.getCategory()).orElse(null);
         if  (category == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Category not found", null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Category not found", null, false));
         }
         User newUser = new User();
         newUser.setFullName(request.getFullName());
@@ -107,27 +117,101 @@ public class AuthService {
         providerProfile.setBio(request.getBio());
         providerProfile.setYearsOfExperience(request.getYears_of_experience());
         providerProfile.setCity(request.getCity());
-        providerRepository.save(providerProfile);
+        providerProfile = providerRepository.save(providerProfile);
 
-        String  token = jwtUtils.generateToken(newUser.getId(), Role.PROVIDER.toString());
+        String accessToken = jwtUtils.generateAccessToken(newUser.getId(), Role.PROVIDER.toString());
+        String refreshToken = jwtUtils.generateRefreshToken(newUser.getId());
+        RefreshToken t = new RefreshToken();
+        t.setUser(newUser);
+        t.setRefreshToken(refreshToken);
+        authRepository.save(t);
 
-        ProviderDTO dto = ProviderDTO.builder()
-                .providerId(providerProfile.getId())
-                .user_id(newUser.getId())
-                .businessName(request.getBusiness_name())
-                .category(category.getNameAr())
-                .bio(request.getBio())
-                .yearsOfExperience(request.getYears_of_experience())
-                .city(request.getCity())
-                .isVerified(providerProfile.is_verified())
-                .averageRating(providerProfile.getAvg_rating())
-                .totalReviews(providerProfile.getTotal_reviews())
-                .createdAt(providerProfile.getCreated_at())
-                .build();
+        UserDTO dto = MapperUserDTO.buildProviderDTO(providerProfile);
 
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setToken(token);
+        authResponse.setAccessToken(accessToken);
+        authResponse.setRefreshToken(refreshToken);
         authResponse.setUser(dto);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Provider created successfully", authResponse));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Provider created successfully", authResponse, true));
+    }
+
+    public ResponseEntity<ApiResponse> login(LoginRequest loginRequest) {
+        final User user = userRepository.findByPhoneNumber(loginRequest.getNumber()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Bad Credentials", null, false));
+        }
+        if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPasswordHash())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Bad Credentials", null, false));
+        }
+        String accessToken = jwtUtils.generateAccessToken(user.getId(), user.getRole().toString());
+        String refreshToken = jwtUtils.generateRefreshToken(user.getId());
+
+        RefreshToken t = new RefreshToken();
+        t.setUser(user);
+        t.setRefreshToken(refreshToken);
+        authRepository.save(t);
+
+        UserDTO dto;
+        if (user.getRole().equals(Role.CLIENT)) {
+            final ClientProfile clientProfile = clientRepository.findByUser_Id(user.getId()).orElse(null);
+            if (clientProfile == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Client not found", null, false));
+            }
+            dto = MapperUserDTO.buildClientDTO(clientProfile);
+
+        }else {
+            final ProviderProfile providerProfile = providerRepository.findByUser_Id(user.getId()).orElse(null);
+            if (providerProfile == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Client not found", null, false));
+            }
+            dto = MapperUserDTO.buildProviderDTO(providerProfile);
+        }
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setAccessToken(accessToken);
+        authResponse.setRefreshToken(refreshToken);
+        authResponse.setUser(dto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Provider created successfully", authResponse, true));
+    }
+
+    public ResponseEntity<ApiResponse> refresh(String refreshToken) {
+        if (!authRepository.existsByRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Refresh token not found", null, false));
+        }
+
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        RefreshToken dbToken = authRepository.findByRefreshTokenAndUser_Id(refreshToken, userId).orElse(null);
+
+        if (dbToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid token", null, false));
+        }
+
+        if (!jwtUtils.validateToken(dbToken.getRefreshToken())) {
+            authRepository.delete(dbToken);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid token", null, false));
+        }
+
+        String accessToken = jwtUtils.generateAccessToken(dbToken.getUser().getId(), dbToken.getUser().getRole().toString());
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setAccessToken(accessToken);
+        authResponse.setRefreshToken(dbToken.getRefreshToken());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Refreshed successfully", authResponse, true));
+    }
+
+    public ResponseEntity<ApiResponse> logout(String refreshToken) {
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("User not found", null, false));
+        }
+        RefreshToken DbRefreshToken = authRepository.findByRefreshTokenAndUser_Id(refreshToken,userId).orElse(null);
+        if (DbRefreshToken == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Refresh token not found", null, false));
+        }
+        authRepository.delete(DbRefreshToken);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse("Logout successfully", null, true));
     }
 }

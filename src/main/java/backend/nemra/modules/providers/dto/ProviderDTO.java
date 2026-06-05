@@ -1,13 +1,16 @@
 package backend.nemra.modules.providers.dto;
 
 import backend.nemra.modules.users.dto.UserDTO;
-import lombok.Builder;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
+@Getter
+@Setter
 public class ProviderDTO extends UserDTO {
     private UUID providerId;
     private String businessName;
