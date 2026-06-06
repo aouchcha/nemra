@@ -12,5 +12,4 @@ INSERT INTO categories (name_en, name_fr, name_ar, is_active, created_at) VALUES
     ('Cleaning Service',   'Nettoyage',         'تنظيف',         true, NOW()),
     ('Gardener',           'Jardinier',         'بستاني',        true, NOW()),
     ('Moving Service',     'Déménagement',      'نقل عفش',       true, NOW()),
-    ('IT Technician',      'Technicien Info',   'تقني معلوميات', true, NOW()),
     ('Photographer',       'Photographe',       'مصور',          true, NOW());

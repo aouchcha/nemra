@@ -1,6 +1,6 @@
-package backend.nemra.modules.clients;
+package backend.nemra.modules.users.clients;
 
-import backend.nemra.modules.clients.model.ClientProfile;
+import backend.nemra.modules.users.clients.model.ClientProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

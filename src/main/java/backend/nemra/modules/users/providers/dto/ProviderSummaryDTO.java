@@ -1,4 +1,4 @@
-package backend.nemra.modules.providers.dto;
+package backend.nemra.modules.users.providers.dto;
 
 import backend.nemra.modules.users.model.User;
 import jakarta.persistence.*;

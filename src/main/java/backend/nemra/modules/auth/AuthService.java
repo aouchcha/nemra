@@ -7,18 +7,16 @@ import backend.nemra.modules.auth.dto.RegisterProvider;
 import backend.nemra.modules.auth.model.RefreshToken;
 import backend.nemra.modules.categories.CategoryRepository;
 import backend.nemra.modules.categories.model.Category;
-import backend.nemra.modules.clients.ClientRepository;
-import backend.nemra.modules.clients.model.ClientProfile;
-import backend.nemra.modules.providers.ProviderRepository;
-import backend.nemra.modules.providers.dto.ProviderDTO;
-import backend.nemra.modules.providers.model.ProviderProfile;
+import backend.nemra.modules.users.clients.ClientRepository;
+import backend.nemra.modules.users.clients.model.ClientProfile;
+import backend.nemra.modules.users.providers.ProviderRepository;
+import backend.nemra.modules.users.providers.model.ProviderProfile;
 import backend.nemra.modules.users.UserRepository;
-import backend.nemra.modules.users.dto.ClientProfileDTO;
 import backend.nemra.modules.users.dto.UserDTO;
 import backend.nemra.modules.users.model.Role;
 import backend.nemra.modules.users.model.User;
 import backend.nemra.shared.response.ApiResponse;
-import backend.nemra.shared.utils.MapperUserDTO;
+import backend.nemra.shared.utils.MapperToDTO;
 import backend.nemra.shared.utils.jwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +64,7 @@ public class AuthService {
             newUser.setPhoneNumber(request.getPhoneNumber());
             newUser.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt(12)));
             newUser.setRole(Role.CLIENT);
+            newUser.setCity(request.getCity());
             newUser = userRepository.save(newUser);
 
             ClientProfile newClientProfile = new ClientProfile();
@@ -82,7 +81,7 @@ public class AuthService {
             t.setRefreshToken(refreshToken);
             authRepository.save(t);
 
-            UserDTO newClientProfileDTO = MapperUserDTO.buildClientDTO(newClientProfile);
+            UserDTO newClientProfileDTO = MapperToDTO.buildClientDTO(newClientProfile);
 
             AuthResponse authResponse = new AuthResponse();
             authResponse.setAccessToken(accessToken);
@@ -108,6 +107,7 @@ public class AuthService {
         newUser.setPhoneNumber(request.getPhoneNumber());
         newUser.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt(12)));
         newUser.setRole(Role.PROVIDER);
+        newUser.setCity(request.getCity());
         newUser = userRepository.save(newUser);
 
         ProviderProfile providerProfile = new ProviderProfile();
@@ -126,7 +126,7 @@ public class AuthService {
         t.setRefreshToken(refreshToken);
         authRepository.save(t);
 
-        UserDTO dto = MapperUserDTO.buildProviderDTO(providerProfile);
+        UserDTO dto = MapperToDTO.buildProviderDTO(providerProfile);
 
         AuthResponse authResponse = new AuthResponse();
         authResponse.setAccessToken(accessToken);
@@ -162,14 +162,18 @@ public class AuthService {
             if (clientProfile == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Client not found", null, false));
             }
-            dto = MapperUserDTO.buildClientDTO(clientProfile);
+            dto = MapperToDTO.buildClientDTO(clientProfile);
 
-        }else {
+        }else if (user.getRole().equals(Role.PROVIDER)) {
             final ProviderProfile providerProfile = providerRepository.findByUser_Id(user.getId()).orElse(null);
             if (providerProfile == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Client not found", null, false));
             }
-            dto = MapperUserDTO.buildProviderDTO(providerProfile);
+            dto = MapperToDTO.buildProviderDTO(providerProfile);
+        } else if (user.getRole().equals(Role.ADMIN)) {
+            dto = MapperToDTO.buildAdminDTO(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("User Not Found", null, false));
         }
 
         AuthResponse authResponse = new AuthResponse();
@@ -177,7 +181,7 @@ public class AuthService {
         authResponse.setRefreshToken(refreshToken);
         authResponse.setUser(dto);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Provider created successfully", authResponse, true));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("User login successfully", authResponse, true));
     }
 
     public ResponseEntity<ApiResponse> refresh(String refreshToken) {

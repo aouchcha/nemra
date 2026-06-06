@@ -1,6 +1,6 @@
 package backend.nemra.modules.categories.model;
 
-import backend.nemra.modules.providers.model.ProviderProfile;
+import backend.nemra.modules.users.providers.model.ProviderProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

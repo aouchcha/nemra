@@ -1,6 +1,6 @@
 package backend.nemra.modules.users.model;
 
-import backend.nemra.modules.clients.model.ClientProfile;
+import backend.nemra.modules.users.clients.model.ClientProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,6 +26,8 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private String city;
 
     @Column(name = "is_active")
     private boolean active = true;

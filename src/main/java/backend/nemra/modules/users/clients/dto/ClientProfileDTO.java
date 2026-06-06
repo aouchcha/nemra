@@ -1,5 +1,6 @@
-package backend.nemra.modules.users.dto;
+package backend.nemra.modules.users.clients.dto;
 
+import backend.nemra.modules.users.dto.UserDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

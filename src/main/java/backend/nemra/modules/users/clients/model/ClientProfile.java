@@ -1,4 +1,4 @@
-package backend.nemra.modules.clients.model;
+package backend.nemra.modules.users.clients.model;
 
 import backend.nemra.modules.users.model.User;
 import jakarta.persistence.*;

@@ -1,5 +1,6 @@
 package backend.nemra.modules.users.dto;
 
+import backend.nemra.modules.users.model.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import java.util.UUID;
 public class UserDTO {
     private UUID user_id;
     private String fullName;
+    private String phone;
+    private Role role;
     private String city;
     private Date createdAt;
 }

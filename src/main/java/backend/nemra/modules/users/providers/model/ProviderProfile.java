@@ -1,4 +1,4 @@
-package backend.nemra.modules.providers.model;
+package backend.nemra.modules.users.providers.model;
 
 import backend.nemra.modules.categories.model.Category;
 import backend.nemra.modules.users.model.User;

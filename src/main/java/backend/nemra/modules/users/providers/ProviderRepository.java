@@ -1,6 +1,6 @@
-package backend.nemra.modules.providers;
+package backend.nemra.modules.users.providers;
 
-import backend.nemra.modules.providers.model.ProviderProfile;
+import backend.nemra.modules.users.providers.model.ProviderProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
