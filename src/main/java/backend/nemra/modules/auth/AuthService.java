@@ -71,7 +71,6 @@ public class AuthService {
             newClientProfile.setUser(newUser);
             newClientProfile.setFullName(request.getFullName());
             newClientProfile.setCity(request.getCity());
-            newClientProfile.setCreated(new Date());
             newClientProfile = clientRepository.save(newClientProfile);
 
             String accessToken = jwtUtils.generateAccessToken(newUser.getId(), Role.CLIENT.toString());
@@ -171,7 +170,7 @@ public class AuthService {
             }
             dto = MapperToDTO.buildProviderDTO(providerProfile);
         } else if (user.getRole().equals(Role.ADMIN)) {
-            dto = MapperToDTO.buildAdminDTO(user);
+            dto = MapperToDTO.buildUserDTO(user);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("User Not Found", null, false));
         }

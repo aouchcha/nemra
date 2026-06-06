@@ -4,6 +4,7 @@ import backend.nemra.modules.users.clients.model.ClientProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -33,10 +34,10 @@ public class User {
     private boolean active = true;
 
     @Column(name = "created_at")
-    private Date createdAt = new Date();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
-    private Date updatedAt = new Date();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ClientProfile clientProfile;

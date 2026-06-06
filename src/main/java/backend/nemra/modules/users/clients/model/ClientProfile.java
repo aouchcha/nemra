@@ -4,6 +4,7 @@ import backend.nemra.modules.users.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -33,5 +34,5 @@ public class ClientProfile {
     private String city;
 
     @Column(name = "created_at", nullable = false)
-    private Date created;
+    private LocalDateTime created = LocalDateTime.now();
 }

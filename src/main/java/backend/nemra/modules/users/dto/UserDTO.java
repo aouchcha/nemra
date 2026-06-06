@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,5 +18,5 @@ public class UserDTO {
     private String phone;
     private Role role;
     private String city;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

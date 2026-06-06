@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -45,5 +46,5 @@ public class ProviderProfile {
     private boolean is_verified = false;
     private double avg_rating = 0.;
     private int total_reviews = 0;
-    private Date created_at =  new Date();
+    private LocalDateTime created_at = LocalDateTime.now();
 }

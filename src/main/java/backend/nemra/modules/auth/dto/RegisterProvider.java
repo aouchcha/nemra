@@ -17,4 +17,5 @@ public class RegisterProvider extends RegisterRequest {
     private String category;
     private String bio;
     private int years_of_experience;
+    private String avatar_url;
 }

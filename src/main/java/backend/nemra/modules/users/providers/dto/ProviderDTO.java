@@ -1,5 +1,6 @@
 package backend.nemra.modules.users.providers.dto;
 
+import backend.nemra.modules.categories.model.Category;
 import backend.nemra.modules.users.dto.UserDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -14,7 +15,7 @@ import java.util.UUID;
 public class ProviderDTO extends UserDTO {
     private UUID providerId;
     private String businessName;
-    private String category;
+    private Category category;
     private String bio;
     private int yearsOfExperience;
     private boolean isVerified;
