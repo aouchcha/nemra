@@ -1,11 +1,13 @@
 package backend.nemra.modules.users.clients.model;
 
+import backend.nemra.modules.jobs.model.Job;
 import backend.nemra.modules.users.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -14,6 +16,7 @@ import java.util.UUID;
 public class ClientProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false, unique = true)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -33,6 +36,9 @@ public class ClientProfile {
 
     private String city;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime created = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Job> jobsAsClient;
 }

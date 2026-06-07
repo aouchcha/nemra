@@ -1,6 +1,7 @@
 package backend.nemra.modules.users.providers.model;
 
 import backend.nemra.modules.categories.model.Category;
+import backend.nemra.modules.jobs.model.Job;
 import backend.nemra.modules.users.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -47,4 +49,7 @@ public class ProviderProfile {
     private double avg_rating = 0.;
     private int total_reviews = 0;
     private LocalDateTime created_at = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Job> jobsAsProvider;
 }

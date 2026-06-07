@@ -5,6 +5,7 @@ import backend.nemra.modules.users.providers.model.ProviderProfile;
 import backend.nemra.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -28,7 +29,13 @@ public class ProviderController {
     }
 
     @PutMapping("/me")
+    @PreAuthorize("hasRole('PROVIDER')")
     public ResponseEntity<ApiResponse> updateProvider(@Valid @RequestBody RegisterProvider request) {
         return providerService.update(request);
+    }
+
+    @GetMapping("/{provider_id}/reviews")
+    public ResponseEntity<ApiResponse> getReviews(@PathVariable UUID provider_id) {
+        return providerService.getReviews(provider_id);
     }
 }

@@ -1,6 +1,6 @@
 CREATE TABLE reviews (
      id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     job_id                UUID UNIQUE REFERENCES jobs(id),
+     job_id                UUID REFERENCES jobs(id),
      reviewer_id           UUID REFERENCES users(id),
      reviewed_id           UUID REFERENCES users(id),
      reviewer_type         VARCHAR(20) CHECK (reviewer_type IN ('CLIENT', 'PROVIDER')),
@@ -19,5 +19,7 @@ CREATE TABLE reviews (
      rating_respect        SMALLINT CHECK (rating_respect BETWEEN 1 AND 5),
 
      comment               TEXT,
-     created_at            TIMESTAMP DEFAULT NOW()
+     created_at            TIMESTAMP DEFAULT NOW(),
+    
+     CONSTRAINT unique_review_per_job_per_type UNIQUE (job_id, reviewer_type)
 );

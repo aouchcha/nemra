@@ -1,11 +1,15 @@
 package backend.nemra.modules.users.model;
 
+import backend.nemra.modules.jobs.model.Job;
+import backend.nemra.modules.reviews.model.Review;
 import backend.nemra.modules.users.clients.model.ClientProfile;
+import backend.nemra.modules.users.providers.model.ProviderProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -14,6 +18,7 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(unique = true, nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "full_name")
@@ -33,7 +38,7 @@ public class User {
     @Column(name = "is_active")
     private boolean active = true;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
@@ -41,4 +46,17 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ClientProfile clientProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private ProviderProfile providerProfile;
+
+    @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY)
+    private List<Review> reviewerList;
+
+    @OneToMany(mappedBy = "reviewed", fetch = FetchType.LAZY)
+    private List<Review> reviewedList;
+
+
+
+
 }

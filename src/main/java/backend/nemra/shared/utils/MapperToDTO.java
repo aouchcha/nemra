@@ -2,6 +2,8 @@ package backend.nemra.shared.utils;
 
 import backend.nemra.modules.categories.dto.CategoryDTO;
 import backend.nemra.modules.categories.model.Category;
+import backend.nemra.modules.reviews.dto.ReviewDTO;
+import backend.nemra.modules.reviews.model.Review;
 import backend.nemra.modules.users.clients.model.ClientProfile;
 import backend.nemra.modules.users.model.User;
 import backend.nemra.modules.users.providers.dto.ProviderDTO;
@@ -18,7 +20,7 @@ public class MapperToDTO {
                 .user_id(providerProfile.getUser().getId())
                 .role(providerProfile.getUser().getRole())
                 .businessName(providerProfile.getBusinessName())
-                .category(providerProfile.getCategory().getNameAr())
+                .category(toCategoryDTO(providerProfile.getCategory()))
                 .phone(providerProfile.getUser().getPhoneNumber())
                 .bio(providerProfile.getBio())
                 .yearsOfExperience(providerProfile.getYearsOfExperience())
@@ -71,6 +73,16 @@ public class MapperToDTO {
                 .category(toCategoryDTO(providerProfile.getCategory()))
                 .averageRating(providerProfile.getAvg_rating())
                 .isVerified(providerProfile.is_verified())
+                .build();
+    }
+
+    public static ReviewDTO buildReviewDTO(Review review) {
+        return ReviewDTO.builder()
+                .id(review.getId())
+                .reviewerName(review.getReviewer().getFullName())
+                .reviewedName(review.getReviewed().getFullName())
+                .ratingOverall(review.getRatingOverall())
+                .createdAt(review.getCreatedAt())
                 .build();
     }
 }
