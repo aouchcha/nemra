@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ClientRepository extends JpaRepository<ClientProfile, Long> {
+public interface ClientRepository extends JpaRepository<ClientProfile, UUID> {
     Optional<ClientProfile> findByUser_Id(UUID userId);
 }

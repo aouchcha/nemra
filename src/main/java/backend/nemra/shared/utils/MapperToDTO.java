@@ -2,6 +2,8 @@ package backend.nemra.shared.utils;
 
 import backend.nemra.modules.categories.dto.CategoryDTO;
 import backend.nemra.modules.categories.model.Category;
+import backend.nemra.modules.jobs.dto.JobDTO;
+import backend.nemra.modules.jobs.model.Job;
 import backend.nemra.modules.reviews.dto.ReviewDTO;
 import backend.nemra.modules.reviews.model.Review;
 import backend.nemra.modules.users.clients.model.ClientProfile;
@@ -83,6 +85,20 @@ public class MapperToDTO {
                 .reviewedName(review.getReviewed().getFullName())
                 .ratingOverall(review.getRatingOverall())
                 .createdAt(review.getCreatedAt())
+                .build();
+    }
+
+    public static JobDTO buildJobDTO(Job job) {
+        return JobDTO.builder()
+                .id(job.getId())
+                .clientId(job.getClient().getId())
+                .clientName(job.getClient().getFullName())
+                .providerId(job.getProvider().getId())
+                .providerName(job.getProvider().getUser().getFullName())
+                .description(job.getDescription())
+                .status(job.getStatus())
+                .createdAt(job.getCreatedAt())
+                .completedAt(job.getCompletedAt())
                 .build();
     }
 }
