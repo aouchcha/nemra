@@ -4,7 +4,9 @@ import backend.nemra.modules.categories.dto.CategoryDTO;
 import backend.nemra.modules.categories.model.Category;
 import backend.nemra.modules.jobs.dto.JobDTO;
 import backend.nemra.modules.jobs.model.Job;
-import backend.nemra.modules.reviews.dto.ReviewDTO;
+import backend.nemra.modules.reviews.dto.ClientReviewDTO;
+import backend.nemra.modules.reviews.dto.ProviderReviewDTO;
+import backend.nemra.modules.reviews.dto.ReviewResponseDTO;
 import backend.nemra.modules.reviews.model.Review;
 import backend.nemra.modules.users.clients.model.ClientProfile;
 import backend.nemra.modules.users.model.User;
@@ -78,11 +80,12 @@ public class MapperToDTO {
                 .build();
     }
 
-    public static ReviewDTO buildReviewDTO(Review review) {
-        return ReviewDTO.builder()
+    public static ReviewResponseDTO buildReviewDTO(Review review) {
+        return ReviewResponseDTO.builder()
                 .id(review.getId())
                 .reviewerName(review.getReviewer().getFullName())
                 .reviewedName(review.getReviewed().getFullName())
+                .comment(review.getComment())
                 .ratingOverall(review.getRatingOverall())
                 .createdAt(review.getCreatedAt())
                 .build();
@@ -99,6 +102,34 @@ public class MapperToDTO {
                 .status(job.getStatus())
                 .createdAt(job.getCreatedAt())
                 .completedAt(job.getCompletedAt())
+                .build();
+    }
+
+    public static ClientReviewDTO buildClientReviewDTO(Review review) {
+        return ClientReviewDTO.builder()
+                .id(review.getId())
+                .reviewerName(review.getReviewer().getFullName())
+                .reviewedName(review.getReviewed().getFullName())
+                .ratingOverall(review.getRatingOverall())
+                .ratingPayment(review.getRatingPayment())
+                .ratingRespect(review.getRatingRespect())
+                .comment(review.getComment())
+                .createdAt(review.getCreatedAt())
+                .build();
+    }
+
+    public static ProviderReviewDTO buildProviderReviewDTO(Review review) {
+        return ProviderReviewDTO.builder()
+                .id(review.getId())
+                .reviewerName(review.getReviewer().getFullName())
+                .reviewedName(review.getReviewed().getFullName())
+                .ratingOverall(review.getRatingOverall())
+                .ratingQuality(review.getRatingQuality())
+                .ratingPunctuality(review.getRatingPunctuality())
+                .ratingCommunication(review.getRatingCommunication())
+                .ratingPriceFairness(review.getRatingPriceFairness())
+                .comment(review.getComment())
+                .createdAt(review.getCreatedAt())
                 .build();
     }
 }

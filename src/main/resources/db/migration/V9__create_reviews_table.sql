@@ -18,7 +18,7 @@ CREATE TABLE reviews (
      rating_payment        SMALLINT CHECK (rating_payment BETWEEN 1 AND 5),
      rating_respect        SMALLINT CHECK (rating_respect BETWEEN 1 AND 5),
 
-     comment               TEXT,
+     comment               TEXT NOT NULL ,
      created_at            TIMESTAMP DEFAULT NOW(),
     
      CONSTRAINT unique_review_per_job_per_type UNIQUE (job_id, reviewer_type)

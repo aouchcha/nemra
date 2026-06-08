@@ -51,20 +51,20 @@ public class UserService {
         if  (client == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Client not found", null, false));
         }
-        if (request.getFullName() != null && !request.getFullName().isEmpty()) {
+        if (!request.getFullName().isEmpty() && !request.getFullName().equals(user.getFullName())) {
             user.setFullName(request.getFullName());
             client.setFullName(request.getFullName());
             updated = true;
         }
-        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isEmpty()) {
+        if (!request.getPhoneNumber().isEmpty() && !request.getPhoneNumber().equals(user.getPhoneNumber())) {
             user.setPhoneNumber(request.getPhoneNumber());
             updated = true;
         }
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+        if (!request.getPassword().isEmpty() && !BCrypt.checkpw(request.getPassword(), user.getPasswordHash())) {
             user.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt(12)));
             updated = true;
         }
-        if (request.getCity() != null && !request.getCity().isEmpty()) {
+        if (!request.getCity().isEmpty() && !request.getCity().equals(user.getCity())) {
             user.setCity(request.getCity());
             client.setCity(request.getCity());
             updated = true;

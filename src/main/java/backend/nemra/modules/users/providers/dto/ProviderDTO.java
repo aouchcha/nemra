@@ -6,6 +6,7 @@ import backend.nemra.modules.users.dto.UserDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,5 +23,5 @@ public class ProviderDTO extends UserDTO {
     private boolean isVerified;
     private double averageRating;
     private int totalReviews;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

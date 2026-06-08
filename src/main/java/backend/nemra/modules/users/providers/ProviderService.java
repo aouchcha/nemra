@@ -4,7 +4,7 @@ package backend.nemra.modules.users.providers;
 import backend.nemra.modules.auth.dto.RegisterProvider;
 import backend.nemra.modules.categories.CategoryRepository;
 import backend.nemra.modules.categories.model.Category;
-import backend.nemra.modules.reviews.dto.ReviewDTO;
+import backend.nemra.modules.reviews.dto.ReviewResponseDTO;
 import backend.nemra.modules.users.UserRepository;
 import backend.nemra.modules.users.model.User;
 import backend.nemra.modules.users.providers.dto.ProviderSummaryDTO;
@@ -111,7 +111,7 @@ public class ProviderService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Provider not found", null, false));
         }
         final User user = provider.getUser();
-        List<ReviewDTO> reviews = user.getReviewedList()
+        List<ReviewResponseDTO> reviews = user.getReviewedList()
                 .stream()
                 .map(MapperToDTO::buildReviewDTO)
                 .toList();
