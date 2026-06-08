@@ -41,17 +41,18 @@ public class JobService {
     }
 
     public ResponseEntity<ApiResponse> createJob(CreateJobRequest request) {
-        final ClientProfile client =  clientRepository.findById(request.getClientId()).orElse(null);
-        if (client == null) {
+        UUID user_id = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        final User user = userRepository.findById(user_id).orElse(null);
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("client not found", null, false));
         }
-        final ProviderProfile provider = providerRepository.findById(request.getProviderId()).orElse(null);
-        if (provider == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("provider not found", null, false));
+
+        if (!user.getRole().equals(Role.CLIENT)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("You aare not a client", null, false));
         }
+
         Job job = new Job();
-        job.setClient(client);
-        job.setProvider(provider);
+        job.setClient(user.getClientProfile());
         job.setDescription(request.getDescription());
         job =  jobRepository.save(job);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("job created", MapperToDTO.buildJobDTO(job), true));
@@ -103,9 +104,11 @@ public class JobService {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("user not found", null, false));
         }
-        if (!jobRepository.existsByProviderId(user_id)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("user not part of this job", null, false));
+        final ProviderProfile provider = providerRepository.findByUser_Id(user.getId()).orElse(null);
+        if (provider == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("provider not found", null, false));
         }
+        job.setProvider(provider);
         job.setStatus(JobStatus.ACCEPTED);
         job = jobRepository.save(job);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("job", MapperToDTO.buildJobDTO(job), true));
