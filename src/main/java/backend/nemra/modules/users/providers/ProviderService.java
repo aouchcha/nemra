@@ -45,7 +45,7 @@ public class ProviderService {
     }
 
     public ResponseEntity<ApiResponse> getProvider(UUID providerId) {
-        ProviderProfile provider = providerRepository.findByUser_Id(providerId).orElse(null);
+        ProviderProfile provider = providerRepository.findById(providerId).orElse(null);
         if (provider == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Provider not found", null, false));
         }
@@ -106,7 +106,7 @@ public class ProviderService {
     }
 
     public ResponseEntity<ApiResponse> getReviews(UUID providerId) {
-        ProviderProfile provider = providerRepository.findByUser_Id(providerId).orElse(null);
+        ProviderProfile provider = providerRepository.findById(providerId).orElse(null);
         if (provider == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Provider not found", null, false));
         }

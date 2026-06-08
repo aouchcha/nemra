@@ -23,6 +23,7 @@ public class MapperToDTO {
                 .providerId(providerProfile.getId())
                 .user_id(providerProfile.getUser().getId())
                 .role(providerProfile.getUser().getRole())
+                .fullName(providerProfile.getUser().getFullName())
                 .businessName(providerProfile.getBusinessName())
                 .category(toCategoryDTO(providerProfile.getCategory()))
                 .phone(providerProfile.getUser().getPhoneNumber())
