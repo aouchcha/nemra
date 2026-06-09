@@ -52,28 +52,28 @@ public class Review {
     private ReviewerType reviewerType;
     
     @Column(name = "rating_overall")
-    private int ratingOverall = 1;
+    private int ratingOverall = 0;
 
     //Filled When The reviewer in the client
 
     @Column(name = "rating_quality")
-    private int ratingQuality = 1;
+    private int ratingQuality = 0;
 
     @Column(name = "rating_punctuality")
-    private int ratingPunctuality = 1;
+    private int ratingPunctuality = 0;
 
     @Column(name = "rating_communication")
-    private int ratingCommunication = 1;
+    private int ratingCommunication = 0;
 
     @Column(name = "rating_price_fairness")
-    private int ratingPriceFairness = 1;
+    private int ratingPriceFairness = 0;
 
     //Filled when the reviewer is the provider
     @Column(name = "rating_payment")
-    private int ratingPayment = 1;
+    private int ratingPayment = 0;
 
     @Column(name = "rating_respect")
-    private int ratingRespect = 1;
+    private int ratingRespect = 0;
 
     private String comment;
 

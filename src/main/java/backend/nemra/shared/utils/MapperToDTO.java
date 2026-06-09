@@ -2,7 +2,9 @@ package backend.nemra.shared.utils;
 
 import backend.nemra.modules.categories.dto.CategoryDTO;
 import backend.nemra.modules.categories.model.Category;
-import backend.nemra.modules.jobs.dto.JobDTO;
+import backend.nemra.modules.jobs.dto.JobCompletedDTO;
+import backend.nemra.modules.jobs.dto.JobNotCompletedDTO;
+import backend.nemra.modules.jobs.dto.JobPendingDTO;
 import backend.nemra.modules.jobs.model.Job;
 import backend.nemra.modules.reviews.dto.ClientReviewDTO;
 import backend.nemra.modules.reviews.dto.ProviderReviewDTO;
@@ -92,18 +94,57 @@ public class MapperToDTO {
                 .build();
     }
 
-    public static JobDTO buildJobDTO(Job job) {
-        return JobDTO.builder()
-                .id(job.getId())
-                .clientId(job.getClient().getId())
-                .clientName(job.getClient().getFullName())
-                .providerId(job.getProvider().getId())
-                .providerName(job.getProvider().getUser().getFullName())
-                .description(job.getDescription())
-                .status(job.getStatus())
-                .createdAt(job.getCreatedAt())
-                .completedAt(job.getCompletedAt())
-                .build();
+    public static JobPendingDTO buildJobDTO(Job job) {
+        JobPendingDTO dto;
+        switch (job.getStatus().toString()) {
+            case "PENDING":
+                dto = JobPendingDTO.builder()
+                        .id(job.getId())
+                        .clientId(job.getClient().getId())
+                        .clientName(job.getClient().getFullName())
+                        .description(job.getDescription())
+                        .status(job.getStatus())
+                        .createdAt(job.getCreatedAt())
+                        .build();
+                break;
+            case "COMPLETED":
+                dto = JobCompletedDTO.builder()
+                        .id(job.getId())
+                        .clientId(job.getClient().getId())
+                        .clientName(job.getClient().getFullName())
+                        .providerId(job.getProvider().getId())
+                        .providerName(job.getProvider().getUser().getFullName())
+                        .description(job.getDescription())
+                        .status(job.getStatus())
+                        .createdAt(job.getCreatedAt())
+                        .completedAt(job.getCompletedAt())
+                        .build();
+                break;
+            case "CANCELLED":
+                if (job.getProvider() == null) {
+                    dto = JobPendingDTO.builder()
+                            .id(job.getId())
+                            .clientId(job.getClient().getId())
+                            .clientName(job.getClient().getFullName())
+                            .description(job.getDescription())
+                            .status(job.getStatus())
+                            .createdAt(job.getCreatedAt())
+                            .build();
+                    break;
+                }
+            default:
+                dto = JobNotCompletedDTO.builder()
+                        .id(job.getId())
+                        .clientId(job.getClient().getId())
+                        .clientName(job.getClient().getFullName())
+                        .providerId(job.getProvider().getId())
+                        .providerName(job.getProvider().getUser().getFullName())
+                        .description(job.getDescription())
+                        .status(job.getStatus())
+                        .createdAt(job.getCreatedAt())
+                        .build();
+        }
+        return dto;
     }
 
     public static ClientReviewDTO buildClientReviewDTO(Review review) {

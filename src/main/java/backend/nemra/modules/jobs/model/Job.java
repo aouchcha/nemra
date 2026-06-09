@@ -45,6 +45,6 @@ public class Job {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "completed_at", updatable = false)
+    @Column(name = "completed_at")
     private LocalDateTime completedAt;
 }

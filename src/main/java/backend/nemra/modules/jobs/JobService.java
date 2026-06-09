@@ -1,7 +1,7 @@
 package backend.nemra.modules.jobs;
 
 import backend.nemra.modules.jobs.dto.CreateJobRequest;
-import backend.nemra.modules.jobs.dto.JobDTO;
+import backend.nemra.modules.jobs.dto.JobPendingDTO;
 import backend.nemra.modules.jobs.model.Job;
 import backend.nemra.modules.jobs.model.JobStatus;
 import backend.nemra.modules.users.UserRepository;
@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,13 +67,13 @@ public class JobService {
         }
         List<Job> myJobs;
         if (user.getRole().equals(Role.CLIENT)) {
-            ClientProfile client = clientRepository.findById(user.getId()).orElse(null);
+            ClientProfile client = clientRepository.findByUser_Id(user.getId()).orElse(null);
             if (client == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("client not found", null, false));
             }
             myJobs = client.getJobsAsClient();
         } else if (user.getRole().equals(Role.PROVIDER)) {
-            ProviderProfile provider = providerRepository.findById(user.getId()).orElse(null);
+            ProviderProfile provider = providerRepository.findByUser_Id(user.getId()).orElse(null);
             if (provider == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("provider not found", null, false));
             }
@@ -80,7 +81,7 @@ public class JobService {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("invalid role", null, false));
         }
-        List<JobDTO> data = myJobs.stream()
+        List<JobPendingDTO> data = myJobs.stream()
                 .map(MapperToDTO::buildJobDTO)
                 .toList();
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("My Jobs", data, true));
@@ -98,6 +99,9 @@ public class JobService {
         Job job = jobRepository.findById(id).orElse(null);
         if (job == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("job not found", null, false));
+        }
+        if (!job.getStatus().equals(JobStatus.PENDING)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("The Job Already Accepted", null, false));
         }
         UUID user_id = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
         final User user = userRepository.findById(user_id).orElse(null);
@@ -119,15 +123,25 @@ public class JobService {
         if (job == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("job not found", null, false));
         }
+
+        if (!job.getStatus().equals(JobStatus.ACCEPTED)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("You can't complete the job", null, false));
+        }
         UUID user_id = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
         final User user = userRepository.findById(user_id).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("user not found", null, false));
         }
-        if (!jobRepository.existsByProviderId(user_id)) {
+        final ProviderProfile profile = providerRepository.findByUser_Id(user.getId()).orElse(null);
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("provider not found", null, false));
+        }
+
+        if (!job.getProvider().equals(profile)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("user not part of this job", null, false));
         }
         job.setStatus(JobStatus.COMPLETED);
+        job.setCompletedAt(LocalDateTime.now());
         job = jobRepository.save(job);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("job", MapperToDTO.buildJobDTO(job), true));
     }
@@ -137,16 +151,58 @@ public class JobService {
         if (job == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("job not found", null, false));
         }
+//        if (job.getStatus().equals(JobStatus.COMPLETED)) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("job can't be canceled", null, false));
+//        }
         UUID user_id = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
         final User user = userRepository.findById(user_id).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("user not found", null, false));
         }
-        if (!jobRepository.existsByProviderIdOrClientId(user_id, user_id)) {
+        if (user.getRole().equals(Role.CLIENT)) {
+            return cancelAsClient(user, job);
+        }else if (user.getRole().equals(Role.PROVIDER)) {
+            return cancelAsProvider(user, job);
+        }else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("user not part of this job", null, false));
         }
-        job.setStatus(JobStatus.CANCELED);
+//        if (!jobRepository.existsByProviderIdOrClientId(user_id, user_id)) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("user not part of this job", null, false));
+//        }
+//        job.setStatus(JobStatus.CANCELED);
+//        job = jobRepository.save(job);
+//        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("job canceled successfully", MapperToDTO.buildJobDTO(job), true));
+    }
+
+    public ResponseEntity<ApiResponse> cancelAsClient(User user, Job job) {
+        if (!job.getStatus().equals(JobStatus.PENDING)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("You can't cancel the job", null, false));
+        }
+        final ClientProfile client = clientRepository.findByUser_Id(user.getId()).orElse(null);
+        if (client == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("user not a client", null, false));
+        }
+        if (!job.getClient().equals(client)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("you can't update this job status", null, false));
+        }
+        job.setStatus(JobStatus.CANCELLED);
         job = jobRepository.save(job);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("job", MapperToDTO.buildJobDTO(job), true));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("job canceled successfully", MapperToDTO.buildJobDTO(job), true));
+    }
+
+    public ResponseEntity<ApiResponse> cancelAsProvider(User user, Job job) {
+        if (job.getStatus().equals(JobStatus.COMPLETED) ) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("You can't cancel the job", null, false));
+        }
+        final ProviderProfile provider = providerRepository.findByUser_Id(user.getId()).orElse(null);
+        if (provider == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("user not a provider", null, false));
+        }
+        if (job.getProvider() == null || !job.getProvider().equals(provider)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("you can't update this job status", null, false));
+        }
+        job.setStatus(JobStatus.CANCELLED);
+        job = jobRepository.save(job);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("job canceled successfully", MapperToDTO.buildJobDTO(job), true));
     }
 }

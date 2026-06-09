@@ -1,7 +1,6 @@
 package backend.nemra.modules.reviews;
 
-import backend.nemra.modules.reviews.dto.CreateReviewBaseDTO;
-import backend.nemra.modules.reviews.model.Review;
+import backend.nemra.modules.reviews.dto.CreateReviewDTO;
 import backend.nemra.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
     @PostMapping()
-    public ResponseEntity<ApiResponse> createReview(@Valid @RequestBody CreateReviewBaseDTO review) {
+    public ResponseEntity<ApiResponse> createReview(@Valid @RequestBody CreateReviewDTO review) {
         return reviewService.createReview(review);
     }
 

@@ -10,12 +10,12 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class CreateReviewBaseDTO {
+public class CreateReviewDTO {
     @NotNull(message = "job id is required")
     private UUID jobId;
 
-    @NotNull(message = "reviewer id is required")
-    private UUID reviewerId;
+//    @NotNull(message = "reviewer id is required")
+//    private UUID reviewerId;
 
     @NotNull(message = "reviewed id is required")
     private UUID reviewedId;
