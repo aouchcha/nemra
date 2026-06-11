@@ -319,30 +319,244 @@ All non-list responses are wrapped in `ApiResponse` with the shape:
 
 ### Request DTOs
 
-- `RegisterRequest`
-- `RegisterClient`
-- `RegisterProvider`
-- `LoginRequest`
-- `CreateCategoryRequest`
-- `UpdateCategory`
-- `CreateJobRequest`
-- `CreateReviewDTO`
-- `UpdateProfileRequest`
+#### `RegisterRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `fullName` | `String` | Yes | User full name |
+| `phoneNumber` | `String` | Yes | Phone used for login |
+| `password` | `String` | Yes | Plain password sent by frontend |
+| `city` | `String` | Yes | User city |
+
+#### `RegisterClient`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `fullName` | `String` | Yes | Inherited from `RegisterRequest` |
+| `phoneNumber` | `String` | Yes | Inherited from `RegisterRequest` |
+| `password` | `String` | Yes | Inherited from `RegisterRequest` |
+| `city` | `String` | Yes | Inherited from `RegisterRequest` |
+
+#### `RegisterProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `fullName` | `String` | Yes | Inherited from `RegisterRequest` |
+| `phoneNumber` | `String` | Yes | Inherited from `RegisterRequest` |
+| `password` | `String` | Yes | Inherited from `RegisterRequest` |
+| `city` | `String` | Yes | Inherited from `RegisterRequest` |
+| `business_name` | `String` | Yes | Provider business name |
+| `category` | `String` | Yes | Category name, matched case-insensitively |
+| `bio` | `String` | No | Provider description |
+| `years_of_experience` | `int` | No | Years of experience |
+| `avatar` | `MultipartFile` | No | Multipart file upload |
+
+#### `LoginRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `number` | `String` | Yes | Phone number, length 10 to 13 |
+| `password` | `String` | Yes | Plain password |
+
+#### `CreateCategoryRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `nameAr` | `String` | Yes | Arabic category name |
+| `nameFr` | `String` | Yes | French category name |
+| `nameEn` | `String` | Yes | English category name |
+
+#### `UpdateCategory`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `categoryId` | `String` | No | Optional extra field in DTO |
+| `nameAr` | `String` | Yes | Inherited from `CreateCategoryRequest` |
+| `nameFr` | `String` | Yes | Inherited from `CreateCategoryRequest` |
+| `nameEn` | `String` | Yes | Inherited from `CreateCategoryRequest` |
+
+#### `CreateJobRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `description` | `String` | Yes | 10 to 1000 characters |
+
+#### `CreateReviewDTO`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `jobId` | `UUID` | Yes | Target job id |
+| `reviewedId` | `UUID` | Yes | User being reviewed |
+| `reviewerType` | `String` | Yes | `CLIENT` or `PROVIDER` |
+| `comment` | `String` | Yes | Review text |
+| `ratingQuality` | `int` | No | Provider review only |
+| `ratingPunctuality` | `int` | No | Provider review only |
+| `ratingCommunication` | `int` | No | Provider review only |
+| `ratingPriceFairness` | `int` | No | Provider review only |
+| `ratingPayment` | `int` | No | Client review only |
+| `ratingRespect` | `int` | No | Client review only |
+
+#### `UpdateProfileRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `fullName` | `String` | No | Optional profile update field |
+| `phoneNumber` | `String` | No | Optional profile update field |
+| `password` | `String` | No | Optional password update field |
+| `city` | `String` | No | Optional profile update field |
 
 ### Response DTOs
 
-- `AuthResponse`
-- `UserDTO`
-- `ClientProfileDTO`
-- `ProviderDTO`
-- `ProviderSummaryDTO`
-- `CategoryDTO`
-- `JobPendingDTO`
-- `JobNotCompletedDTO`
-- `JobCompletedDTO`
-- `ReviewResponseDTO`
-- `ClientReviewDTO`
-- `ProviderReviewDTO`
+#### `AuthResponse`
+
+| Field | Type | Notes |
+|---|---|---|
+| `accessToken` | `String` | JWT access token |
+| `refreshToken` | `String` | Refresh token |
+| `user` | `UserDTO` | Logged-in/registered user payload |
+
+#### `UserDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `user_id` | `UUID` | User id |
+| `fullName` | `String` | Full name |
+| `phone` | `String` | Phone number |
+| `role` | `Role` | `ADMIN`, `CLIENT`, or `PROVIDER` |
+| `city` | `String` | City |
+| `createdAt` | `LocalDateTime` | Creation timestamp |
+
+#### `ClientProfileDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `user_id` | `UUID` | Parent user id |
+| `fullName` | `String` | Inherited from `UserDTO` |
+| `phone` | `String` | Inherited from `UserDTO` |
+| `role` | `Role` | Inherited from `UserDTO` |
+| `city` | `String` | Inherited from `UserDTO` |
+| `createdAt` | `LocalDateTime` | Inherited from `UserDTO` |
+| `client_profile_id` | `UUID` | Client profile id |
+
+#### `ProviderDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `user_id` | `UUID` | Parent user id |
+| `fullName` | `String` | Inherited from `UserDTO` |
+| `phone` | `String` | Inherited from `UserDTO` |
+| `role` | `Role` | Inherited from `UserDTO` |
+| `city` | `String` | Inherited from `UserDTO` |
+| `createdAt` | `LocalDateTime` | Inherited from `UserDTO` and also set in provider mapper |
+| `providerId` | `UUID` | Provider profile id |
+| `businessName` | `String` | Provider business name |
+| `category` | `CategoryDTO` | Nested category |
+| `bio` | `String` | Provider bio |
+| `yearsOfExperience` | `int` | Experience years |
+| `isVerified` | `boolean` | Verification flag |
+| `averageRating` | `double` | Average rating |
+| `totalReviews` | `int` | Number of reviews |
+| `avatarUrl` | `String` | Avatar path/url |
+
+#### `ProviderSummaryDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Provider profile id |
+| `fullName` | `String` | Provider full name |
+| `businessName` | `String` | Business name |
+| `category` | `CategoryDTO` | Nested category |
+| `averageRating` | `double` | Average rating |
+| `isVerified` | `boolean` | Verification flag |
+| `avatarUrl` | `String` | Public avatar URL |
+
+#### `CategoryDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Category id |
+| `nameEn` | `String` | English name |
+| `nameFr` | `String` | French name |
+| `nameAr` | `String` | Arabic name |
+| `isActive` | `boolean` | Active flag |
+| `createdAt` | `LocalDateTime` | Creation timestamp |
+
+#### `JobPendingDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Job id |
+| `clientId` | `UUID` | Client profile id |
+| `clientName` | `String` | Client full name |
+| `description` | `String` | Job description |
+| `status` | `JobStatus` | `PENDING`, `ACCEPTED`, `COMPLETED`, `CANCELLED` |
+| `createdAt` | `LocalDateTime` | Creation timestamp |
+
+#### `JobNotCompletedDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Inherited from `JobPendingDTO` |
+| `clientId` | `UUID` | Inherited from `JobPendingDTO` |
+| `clientName` | `String` | Inherited from `JobPendingDTO` |
+| `description` | `String` | Inherited from `JobPendingDTO` |
+| `status` | `JobStatus` | Inherited from `JobPendingDTO` |
+| `createdAt` | `LocalDateTime` | Inherited from `JobPendingDTO` |
+| `providerId` | `UUID` | Provider profile id |
+| `providerName` | `String` | Provider full name |
+
+#### `JobCompletedDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Inherited from `JobNotCompletedDTO` |
+| `clientId` | `UUID` | Inherited from `JobNotCompletedDTO` |
+| `clientName` | `String` | Inherited from `JobNotCompletedDTO` |
+| `description` | `String` | Inherited from `JobNotCompletedDTO` |
+| `status` | `JobStatus` | Inherited from `JobNotCompletedDTO` |
+| `createdAt` | `LocalDateTime` | Inherited from `JobNotCompletedDTO` |
+| `providerId` | `UUID` | Inherited from `JobNotCompletedDTO` |
+| `providerName` | `String` | Inherited from `JobNotCompletedDTO` |
+| `completedAt` | `LocalDateTime` | Completion timestamp |
+
+#### `ReviewResponseDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Review id |
+| `reviewerName` | `String` | Reviewer full name |
+| `reviewedName` | `String` | Reviewed user full name |
+| `ratingOverall` | `int` | Overall rating |
+| `comment` | `String` | Review comment |
+| `createdAt` | `LocalDateTime` | Creation timestamp |
+
+#### `ClientReviewDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Inherited from `ReviewResponseDTO` |
+| `reviewerName` | `String` | Inherited from `ReviewResponseDTO` |
+| `reviewedName` | `String` | Inherited from `ReviewResponseDTO` |
+| `ratingOverall` | `int` | Inherited from `ReviewResponseDTO` |
+| `comment` | `String` | Inherited from `ReviewResponseDTO` |
+| `createdAt` | `LocalDateTime` | Inherited from `ReviewResponseDTO` |
+| `ratingPayment` | `int` | Payment rating |
+| `ratingRespect` | `int` | Respect rating |
+
+#### `ProviderReviewDTO`
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Inherited from `ReviewResponseDTO` |
+| `reviewerName` | `String` | Inherited from `ReviewResponseDTO` |
+| `reviewedName` | `String` | Inherited from `ReviewResponseDTO` |
+| `ratingOverall` | `int` | Inherited from `ReviewResponseDTO` |
+| `comment` | `String` | Inherited from `ReviewResponseDTO` |
+| `createdAt` | `LocalDateTime` | Inherited from `ReviewResponseDTO` |
+| `ratingQuality` | `int` | Quality rating |
+| `ratingPunctuality` | `int` | Punctuality rating |
+| `ratingCommunication` | `int` | Communication rating |
+| `ratingPriceFairness` | `int` | Price fairness rating |
 
 ## MapperToDTO.java
 
