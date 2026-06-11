@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -17,5 +18,5 @@ public class RegisterProvider extends RegisterRequest {
     private String category;
     private String bio;
     private int years_of_experience;
-    private String avatar_url;
+    private MultipartFile avatar;
 }

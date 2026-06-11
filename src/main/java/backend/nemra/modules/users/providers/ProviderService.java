@@ -11,6 +11,7 @@ import backend.nemra.modules.users.providers.dto.ProviderSummaryDTO;
 import backend.nemra.modules.users.providers.model.ProviderProfile;
 import backend.nemra.shared.response.ApiResponse;
 import backend.nemra.shared.utils.MapperToDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,20 +27,24 @@ public class ProviderService {
     private final UserRepository userRepository;
     private final ProviderRepository providerRepository;
     private final CategoryRepository categoryRepository;
+    private final String publicUrl;
     public ProviderService(
             ProviderRepository providerRepository,
             UserRepository userRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            @Value("${r2.public-url}") String publicUrl
     ) {
         this.providerRepository = providerRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.publicUrl = publicUrl;
     }
 
     public ResponseEntity<ApiResponse> getProviders() {
+        System.out.println(publicUrl);
         List<ProviderSummaryDTO> providerDTOList =  providerRepository.findAll()
                 .stream()
-                .map(MapperToDTO::toProviderSummaryDTO)
+                .map(p -> MapperToDTO.toProviderSummaryDTO(p, publicUrl))
                 .toList();
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Providers List", providerDTOList, true));
     }

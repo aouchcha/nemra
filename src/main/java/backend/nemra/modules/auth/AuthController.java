@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -30,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/register/provider")
-    public ResponseEntity<ApiResponse> registerProvider(@Valid @RequestBody RegisterProvider registerProvider) {
+    public ResponseEntity<ApiResponse> registerProvider(@Valid @ModelAttribute RegisterProvider registerProvider) throws IOException {
         return authService.registerProvider(registerProvider);
     }
 

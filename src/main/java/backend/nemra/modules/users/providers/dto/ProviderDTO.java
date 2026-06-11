@@ -24,4 +24,5 @@ public class ProviderDTO extends UserDTO {
     private double averageRating;
     private int totalReviews;
     private LocalDateTime createdAt;
+    private String avatarUrl;
 }

@@ -7,6 +7,7 @@ import backend.nemra.modules.auth.dto.RegisterProvider;
 import backend.nemra.modules.auth.model.RefreshToken;
 import backend.nemra.modules.categories.CategoryRepository;
 import backend.nemra.modules.categories.model.Category;
+import backend.nemra.modules.media.MediaService;
 import backend.nemra.modules.users.clients.ClientRepository;
 import backend.nemra.modules.users.clients.model.ClientProfile;
 import backend.nemra.modules.users.providers.ProviderRepository;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -38,6 +40,7 @@ public class AuthService {
     private final ProviderRepository providerRepository;
     private final CategoryRepository categoryRepository;
     private final jwtUtils jwtUtils;
+    private final MediaService mediaService;
 
     public AuthService(
             AuthRepository authRepository,
@@ -45,7 +48,8 @@ public class AuthService {
             ClientRepository clientRepository,
             ProviderRepository providerRepository,
             CategoryRepository categoryRepository,
-            jwtUtils jwtUtils
+            jwtUtils jwtUtils,
+            MediaService mediaService
     ) {
         this.authRepository = authRepository;
         this.userRepository = userRepository;
@@ -53,6 +57,7 @@ public class AuthService {
         this.providerRepository = providerRepository;
         this.categoryRepository = categoryRepository;
         this.jwtUtils = jwtUtils;
+        this.mediaService = mediaService;
     }
 
     @Transactional
@@ -96,7 +101,7 @@ public class AuthService {
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse> registerProvider(RegisterProvider request) {
+    public ResponseEntity<ApiResponse> registerProvider(RegisterProvider request) throws IOException {
         Category category = categoryRepository.findByNameIgnoreCase(request.getCategory()).orElse(null);
         if  (category == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Category not found", null, false));
@@ -107,6 +112,7 @@ public class AuthService {
         newUser.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt(12)));
         newUser.setRole(Role.PROVIDER);
         newUser.setCity(request.getCity());
+
         newUser = userRepository.save(newUser);
 
         ProviderProfile providerProfile = new ProviderProfile();
@@ -116,6 +122,10 @@ public class AuthService {
         providerProfile.setBio(request.getBio());
         providerProfile.setYearsOfExperience(request.getYears_of_experience());
         providerProfile.setCity(request.getCity());
+        if (request.getAvatar() != null) {
+            String avatar_url = mediaService.uploadFile(request.getAvatar(), "avatar");
+            providerProfile.setAvatarUrl(avatar_url);
+        }
         providerProfile = providerRepository.save(providerProfile);
 
         String accessToken = jwtUtils.generateAccessToken(newUser.getId(), Role.PROVIDER.toString());

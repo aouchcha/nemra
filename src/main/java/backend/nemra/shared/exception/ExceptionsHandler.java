@@ -9,6 +9,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.io.IOException;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
@@ -20,8 +23,17 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ApiResponse handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException e) {
+
         return new ApiResponse("Bad Request", null, false);
+    }
+
+    @ExceptionHandler(MyBadRequest.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse handleMyBadRequest(MyBadRequest e) {
+
+        return new ApiResponse(e.getMessage(), null, false);
     }
 
 //    @ExceptionHandler(NullPointerException.class)
@@ -36,4 +48,12 @@ public class ExceptionsHandler {
         return new ApiResponse("Method not allowed", null, false);
     }
 
+    @ExceptionHandler({
+            MaxUploadSizeExceededException.class,
+            IOException.class
+    })
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponse handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        return new ApiResponse(e.getMessage(), null, false);
+    }
 }

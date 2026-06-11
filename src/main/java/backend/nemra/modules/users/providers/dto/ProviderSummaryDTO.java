@@ -18,4 +18,5 @@ public class ProviderSummaryDTO {
     private CategoryDTO category;
     private double averageRating;
     private boolean isVerified;
+    private String avatarUrl;
 }

@@ -17,6 +17,7 @@ import backend.nemra.modules.users.providers.dto.ProviderSummaryDTO;
 import backend.nemra.modules.users.providers.model.ProviderProfile;
 import backend.nemra.modules.users.clients.dto.ClientProfileDTO;
 import backend.nemra.modules.users.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Value;
 
 public class MapperToDTO {
 
@@ -36,6 +37,7 @@ public class MapperToDTO {
                 .averageRating(providerProfile.getAvg_rating())
                 .totalReviews(providerProfile.getTotal_reviews())
                 .createdAt(providerProfile.getCreated_at())
+                .avatarUrl(providerProfile.getAvatarUrl())
                 .build();
     }
 
@@ -72,7 +74,7 @@ public class MapperToDTO {
                 .build();
     }
 
-    public static ProviderSummaryDTO toProviderSummaryDTO(ProviderProfile providerProfile) {
+    public static ProviderSummaryDTO toProviderSummaryDTO(ProviderProfile providerProfile, String publicURL) {
         return ProviderSummaryDTO.builder()
                 .id(providerProfile.getId())
                 .fullName(providerProfile.getUser().getFullName())
@@ -80,6 +82,7 @@ public class MapperToDTO {
                 .category(toCategoryDTO(providerProfile.getCategory()))
                 .averageRating(providerProfile.getAvg_rating())
                 .isVerified(providerProfile.is_verified())
+                .avatarUrl(publicURL + providerProfile.getAvatarUrl())
                 .build();
     }
 
