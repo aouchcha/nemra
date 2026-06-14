@@ -101,6 +101,12 @@
             <version>2.9.1</version>
         </dependency>
 
+        <!-- LiveKit -->
+        <dependency>
+            <groupId>io.livekit</groupId>
+            <artifactId>livekit-server</artifactId>
+            <version>0.13.0</version>
+        </dependency>
 
         <!-- Validation -->
         <dependency>
