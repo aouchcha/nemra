@@ -1,0 +1,7 @@
+node_modules
+.next
+.git
+.idea
+.vscode
+*.iml
+.DS_Store
