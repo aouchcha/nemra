@@ -67,8 +67,8 @@ export default function DashboardPage() {
 
       {error ? <Card className="stack-card"><p className="card-title">Failed to load</p><p className="muted">{error}</p></Card> : null}
 
-      <div className="grid-2">
-        <Card className="stack-card">
+      {/*<div className="grid-2">*/}
+      {/*  <Card className="stack-card">*/}
           <SectionHeading eyebrow="Categories" title="Current categories" />
           {loading ? <p className="muted">Loading...</p> : categories.length ? categories.slice(0, 4).map((category) => <CategoryCard key={category.id} category={category} />) : <EmptyState title="No categories returned" />}
         </Card>
@@ -85,4 +85,4 @@ export default function DashboardPage() {
     </div>
   );
 }
-
+div––
